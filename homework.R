@@ -16,7 +16,11 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 #Use a function to check that your conversion succeeded
 
 #ANSWER
+glimpse(ds)
 
+ds$Year <- as.numeric(as.character(ds$Year))
+
+glimpse(ds)
 
 ### Question 2 ---------- 
 
@@ -24,7 +28,7 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 # change ds so that all of the variables are lowercase
 
 #ANSWER
-
+names(ds) <- tolower(names(ds))
 
 ### Question 3 ----------
 
@@ -33,14 +37,15 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 # Hint: read the documentation for ?floor and make sure year is numeric (from Question 1)
 
 #ANSWER
-
+ds <- ds %>%
+  mutate(decade = floor(year / 10) * 10)
 
 ### Question 4 ----------
 
 # Sort the dataset by rank so that 1 is at the top
 
 #ANSWER
-
+ds <- arrange(ds, rank)
 
 ### Question 5 ----------
 
@@ -48,7 +53,9 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 # That just has the artists and songs for the top 10 songs
 
 #ANSWER
-
+top10 <- ds %>%
+  filter(rank <= 10) %>%
+  select(c("artist", "song"))
 
 
 ### Question 6 ----------
@@ -58,7 +65,10 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 # Hint, the function drop_na() might help. Read ?drop_na
 
 #ANSWER
-
+ds_sum <- ds %>%
+  drop_na() %>%
+  summarise(year_avg = round(mean(year)), year_min = min(year), year_max = max(year))
+  
 
 ### Question 7 ----------
 
@@ -69,7 +79,9 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 # (this might take some searching to find functions that will help)
 
 #ANSWER
-
+ds_filter <- ds %>% 
+  filter(year %in% c(1980, 1879, 2020)) %>% 
+  arrange(year)
 
 ### Question 8 ---------- 
 
@@ -80,7 +92,20 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 # find the correct oldest, averag-ist, and most recent songs
 
 #ANSWER
+ds_new <- ds %>% 
+  mutate(year = ifelse(song == "Brass in Pocket", 1979, year)) %>% 
+  mutate(decade = floor(year / 10) * 10)
 
+# redo Q6
+ds_sum <- ds %>%
+  drop_na() %>%
+  summarise(year_avg = round(mean(year)), year_min = min(year), year_max = max(year))
+  
+  
+# redo Q7
+ds_filter <- ds %>% 
+  filter(year %in% c(1980, 1879, 2020)) %>% 
+  arrange(year)
 
 ### Question 9 ---------
 
@@ -102,6 +127,11 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 # Check against your answers from Question 9 to make sure it matches
 
 #ANSWER
+
+most_songs <- ds %>% 
+  drop_na() %>% 
+  count(decade) %>% 
+  slice_max(n, n = 1)
 
 
 ### Question 11 ------
